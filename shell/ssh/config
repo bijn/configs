@@ -1,0 +1,11 @@
+# Bijan Sondossi
+
+# Global settings
+Host *
+ForwardAgent no
+ForwardX11 no
+ServerAliveInterval 60
+
+# Other configuration files
+# Unsure if this will work on some systems
+Include configs/*

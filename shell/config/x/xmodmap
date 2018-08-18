@@ -1,0 +1,6 @@
+clear lock
+clear control
+keycode 0x42 = Control_L 
+keycode 0x25 = Caps_Lock
+add lock = Caps_Lock
+add control = Control_L Control_R

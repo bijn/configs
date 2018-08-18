@@ -1,0 +1,14 @@
+#!/bin/bash
+
+##
+#  @brief Prints a usage message to stderr.
+#  @param $1 The usage message.
+#  @returns false always.
+#
+
+if ! empty-string $1;
+then
+    print-err "USAGE: $1"
+fi
+
+false

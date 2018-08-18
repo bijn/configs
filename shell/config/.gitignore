@@ -1,0 +1,6 @@
+google-chrome
+mimeapps.list
+pulse
+configstore
+tmp/*
+!tmp/README.md

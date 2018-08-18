@@ -1,0 +1,23 @@
+#!/bin/bash
+
+##
+#  @brief Generates an rsa key and stores it in ~/.ssh/keys/
+#  @param $1 The name of the key.
+#  @returns true if keyname is not empty and key is successfully
+#           generated, false otherwise.
+#
+
+if ! empty-string "$1"
+then
+    if ! [ -e $HOME/.ssh/keys ]
+    then
+        mkdir -p $HOME/.ssh/keys/
+    fi
+
+    ssh-keygen -t rsa -b 4096 -f $HOME/.ssh/keys/$1 -C "$1 key"
+    return
+else
+    print_usage "generate-rsa-key <name>"
+fi
+
+false

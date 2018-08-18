@@ -1,0 +1,30 @@
+#!/bin/bash
+
+if ! empty-string "$1"
+then
+    # # fix this later
+    # args=(-r --no-parent -A \'*.pdf\' $1)
+    # if ! empty-string "$2"
+    # then
+    #     args=(--user=$2 --ask-password ${args[@]})
+    # fi
+    # if wget ${args[@]}
+    # then
+    #     return
+    # fi
+
+    if ! empty-string "$2"
+    then
+        wget --user=$2 --ask-password \
+                -r --no-parent -A '*.pdf' \
+                $1
+        return
+    fi
+
+    wget -r --no-parent -A '*.pdf' $1
+    return
+else
+    print-usage "wget-pdfs <url> [user]"
+fi
+
+false

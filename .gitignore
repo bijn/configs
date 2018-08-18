@@ -1,0 +1,10 @@
+.DS_Store
+htop
+known_hosts
+default-keys.txt
+install_manifest.txt
+
+settings/ssh/keys
+settings/ssh/configs
+
+build

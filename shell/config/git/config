@@ -1,0 +1,5 @@
+[include]
+        path = ~/.config/tmp/git-user.config
+[alias]
+	acp = ! git commit -a -m \"acp commit\" && git push
+	lg = log --pretty=format:\"%Cblue%H%Creset%Cred%d%Creset%n%cn (%ce)%n%Cgreen%ad (%ar)%Creset%n%B\" --graph

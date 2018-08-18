@@ -1,0 +1,20 @@
+#!/bin/bash
+
+##
+#  @brief Byte compiles the elisp files in a directory. Note that it
+#         compiles all subdirectoies as well.
+#  @param link The directory to compile.
+#  @returns true if successful and false otherwise.
+#
+
+if ! empty-string $1
+then
+    if emacs --batch --eval "(byte-recompile-directory \"$1\" 0 t)"
+    then
+        exit
+    fi
+else
+    print-usage "emacs-compile-dir <dir>"
+fi
+
+false

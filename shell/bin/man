@@ -1,0 +1,14 @@
+#!/bin/bash
+
+##
+#  @brief Man pages (for builtins). Also see 'help CMD'.
+#  @param $1 The command to lookup.
+#  @note source: https://goo.gl/o7xw2U
+#
+
+case "$(type -t "$1"):$1"
+in
+    builtin:*) help "$1" | "${PAGER:-less}";;
+    *[[?*]*) help "$1" | "${PAGER:-less}";;
+    *) command -p man "$@";;
+esac

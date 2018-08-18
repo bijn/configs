@@ -1,0 +1,49 @@
+#!/bin/bash
+
+##
+#  @brief Writes the name, username, hostname, and host attributes
+#         to the corresponding config file.
+#  @param $1 The host/file name.
+#  @param $2 The username on the server.
+#  @param $3 The hostname of the server.
+#  @param $4 The name of the key.
+#  @returns true if keyname is not empty and key is successfully
+#           generated, false otherwise.
+#
+#  @todo Make the host config modifications more intelligent.
+#        Currently, we simply skip if the attributes are already
+#        written.
+#
+
+if non-empty-string "$1" "$2" "$3"
+then
+    if ! [ -e $HOME/.ssh/configs ]
+    then
+        mkdir -p $HOME/.ssh/configs
+    fi
+
+    cfg=$HOME/.ssh/configs/$1.config
+    if ! [ -f $cfg ]
+    then
+        echo "Host $1" > $cfg
+        echo "User $2" >> $cfg
+        echo "Hostname $3" >> $cfg
+    fi
+
+    if non-empty-string "$4"
+    then
+        attribute="PreferredAuthentications"
+        if ! ( cat $cfg | grep $attribute &> /dev/null )
+        then
+            echo "$attribute publickey" >> $cfg
+        fi
+
+        attribute="IdentityFile"
+        if ! ( cat $cfg | grep $attribute &> /dev/null )
+        then
+            echo "$attribute ~/.ssh/keys/$4" >> $cfg
+        fi
+    fi
+else
+    print-usage "ssh-write-config host username hostname [key]"
+fi

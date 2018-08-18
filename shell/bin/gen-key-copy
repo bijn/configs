@@ -1,0 +1,46 @@
+#!/bin/bash
+
+##
+#  @brief Generates an rsa key and stores it in ~/.ssh/keys/ then
+#         takes the public key and copies it to the specified
+#         server. If the host is specified the corresponding config
+#         file will be created or appended to.
+#  @param $1 The name of the key.
+#  @param $2 The username on the server.
+#  @param $3 The hostname of the server.
+#  @param $4 The optional host parameter.
+#  @returns true if keyname is not empty and key is successfully
+#           generated, false otherwise.
+#
+#  @todo Refactor/clean up.
+#
+
+if ! empty-string "$1" \
+        && ! empty-string "$2" \
+        && ! empty-string "$3"
+then
+    if ! [ -f $HOME/.ssh/keys/$1 ]
+    then
+        generate-rsa-key $1
+    fi
+
+    if [ -f $HOME/.ssh/keys/$1 ]
+    then
+        if ssh-copy-id -i $HOME/.ssh/keys/$1.pub $2@$3
+        then
+            if ! empty-string "$4"
+            then
+                ssh-write-config $4 $2 $3 $1
+            fi
+            return
+        else
+            echo "Error: unable to copy id." >&2
+        fi
+    else
+        echo "Error: key does not exist." >&2
+    fi
+else
+    print-usage "gen-key-copy <name> <user> <hostname> [host]"
+fi
+
+false

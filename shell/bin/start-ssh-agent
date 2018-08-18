@@ -1,0 +1,41 @@
+#!/bin/bash
+
+##
+#  @brief Adds keys listed in ~/.ssh/default_keys to the ssh agent.
+#  @param $@ Optional list of keys to add to the default key list.
+#  @returns true if the key list exists, false otherwise.
+#
+#  @todo make the return values better.
+#
+
+if ! [ $# -eq 0 ]
+then
+    for keyname in $@
+    do
+        echo $keyname >> $HOME/.ssh/default-keys.txt
+    done
+fi
+
+# doesn't seem like i need to start the ssh agent at all, ssh-add -l
+# automatically does it
+
+# if ! ( ps -ax | grep [s]sh-agent >& /dev/null )
+# then
+#     eval "$(ssh-agent -s)"
+# fi
+
+if [ -f $HOME/.ssh/default-keys.txt ]
+then
+    for key in $(cat $HOME/.ssh/default-keys.txt)
+    do
+        if ! ( ssh-add -l | grep .ssh/keys/$key >& /dev/null)
+        then
+            ssh-add $HOME/.ssh/keys/$key
+        fi
+    done
+    return
+else
+    echo "Could not find key list at ~/.ssh/default-keys.txt" >&2
+fi
+
+false

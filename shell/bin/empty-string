@@ -1,0 +1,15 @@
+#!/bin/bash
+
+##
+#  @brief Empty string helper function.
+#  @param $@ The strings to check.
+#  @returns true if all strings are empty, false otherwise.
+#
+
+args=($@)
+if [ ${#args[*]} -eq 0 ]
+then
+    exit
+fi
+
+false

@@ -1,0 +1,45 @@
+#!/bin/bash
+
+##
+#  @brief Generates an rsa key and stores it in ~/.ssh/keys/ then
+#         takes the public key and uses curl and GitHub API to
+#         upload the public half of the key to GitHub for use with
+#         ssh.
+#  @param $1 The name of the key.
+#  @param $2 The optional host parameter.
+#  @returns true if keyname is not empty and key is successfully
+#           generated and uploaded, false otherwise.
+#  @note Useful links: https://goo.gl/Bc9qfp, https://goo.gl/g46BqG
+#
+#  @todo Refactor/clean up.
+#
+
+if ! empty-string "$1"
+then
+    if [ -f $HOME/.ssh/keys/$1 ]
+    then
+        generate-rsa-key $1
+    fi
+
+    if [ -f $HOME/.ssh/keys/$1 ]
+    then
+        pubkey=$(cat $HOME/.ssh/keys/$1.pub)
+        # source: https://goo.gl/k5RbdU
+        curl -u "bijn" \
+             --data "{\"title\":\"$1\",\"key\":\"$pubkey\"}" \
+             https://api.github.com/user/keys
+
+        if ! empty-string $2
+        then
+            ssh-write-config $2 git github.com $1
+        fi
+
+        return
+    else
+        echo "Unable to generate key." >&2
+    fi
+else
+    print-usage "gen-key-copy-git <name> <host>"
+fi
+
+false

@@ -1,0 +1,21 @@
+#!/bin/bash
+
+##
+#  @brief Prompts the user with the given message and waits for a single
+#         character response.
+#  @param $1 The prompt.
+#  @returns true if the response is y or Y. Returns false otherwise.
+#
+
+if ! empty-string $1
+then
+    read -p "$1 [yN] " -r
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        exit
+    fi
+else
+    print-usage "y-or-n <message>"
+fi
+
+false

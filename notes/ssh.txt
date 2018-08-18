@@ -1,0 +1,30 @@
+################################################################
+# Key Generation ###############################################
+#                                                              #
+# NOTE: need brew to install ssh-copy-id                       #
+#                                                              #
+# $ ssh-keygen -t rsa -b 4096 -f ~/.ssh/keys/x_id -C "x login" #
+# $ ssh-copy-id -i ~/.ssh/keys/id_x.pub user@domain.com        #
+#                                                              #
+# add 'IdentityFile x_id' to corresponding host in cofig       #
+# Host x                                                       #
+#  IdentityFile x_id                                           #
+################################################################
+
+############################################################
+# Change key passphrase: http://tinyurl.com/hbe4cxd ########
+#                                                          #
+# $ ssh-keygen -p -f ~/.ssh/keys/x_id                      #
+# provide old passphrase and new passphrase at the prompts #
+############################################################
+
+###################################################
+# GitHub: https://help.github.com/categories/ssh/ #
+#                                                 #
+# adding to ssh-agent                             #
+# $ eval "$(ssh-agent -s)"                        #
+# $ ssh-add ~/.ssh/id_rsa                         #
+#                                                 #
+# list added keys                                 #
+# $ ssh-add -l                                    #
+###################################################

@@ -1,0 +1,6 @@
+[submodule "xresources"]
+	path = modules/xresources
+	url = https://github.com/dracula/xresources
+[submodule "kv-bash"]
+	path = modules/kv-bash
+	url = https://github.com/damphat/kv-bash

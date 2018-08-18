@@ -1,0 +1,35 @@
+# https://pwmt.org/projects/zathura/documentation
+# https://pwmt.org/projects/girara/options
+
+
+# Key binds ------------------------------------------------------------
+
+map <C-i> recolor
+
+# Colors ---------------------------------------------------------------
+
+set recolor "true"
+set recolor-keephue "false"
+
+set default-bg "#282a36"
+set default-fg "#f8f8f2"
+set completion-bg "#282a36"
+set completion-fg "#f8f8f2"
+set completion-highlight-fg "#282a36"
+set completion-highlight-bg "#f1fa8c"
+set highlight-color "#f1fa8c"
+set highlight-active-color "#f1fa8c"
+set inputbar-bg "#44475a"
+set inputbar-fg "#f8f8f2"
+set statusbar-fg "#f8f8f2"
+set statusbar-bg "#44475a"
+set recolor-lightcolor "#44475a"
+set recolor-darkcolor "#f8f8f2"
+
+# Change these colors later
+set notification-bg "#090300"
+set notification-fg "#f7f7f7"
+set notification-error-bg "#090300"
+set notification-error-fg "#db2d20"
+set notification-warning-bg "#090300"
+set notification-warning-fg "#db2d20"
