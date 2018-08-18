@@ -3,7 +3,7 @@ then
     exit 1
 fi
 
-if git clone --recursive https://github.com/bijn/bash $1 && cd $1
+if git clone --recursive https://github.com/bijn/configs $1 && cd $1
 then
     for file in $PWD/shell/*
     do
@@ -16,7 +16,7 @@ then
          >> shell/config/tmp/bash-config.bash
     echo 'export SH_MODULE_DIR=$SH_ROOT_DIR/modules' \
          >> shell/config/tmp/bash-config.bash
-    echo 'export SH_SETTINGS_DI=$SH_ROOT_DIR/shell' \
+    echo 'export SH_SETTINGS_DIR=$SH_ROOT_DIR/shell' \
          >> shell/config/tmp/bash-config.bash
     echo 'export SH_CONFIG_DIR=$SH_SETTINGS_DIR/config' \
          >> shell/config/tmp/bash-config.bash
