@@ -17,9 +17,9 @@ alias fullscreen='xrandr --output $(xrandr-primary) \
                          --mode $(xrandr-native)'
 
 # bash-git-prompt
-if [ -f /usr/lib/bash-git-prompt/gitprompt.sh ]
+if [ -f $SH_MODULE_DIR/bash-git-prompt/gitprompt.sh ]
 then
     GIT_PROMPT_ONLY_IN_REPO=1
     GIT_PROMPT_THEME=my-theme
-    source /usr/lib/bash-git-prompt/gitprompt.sh
+    source $SH_MODULE_DIR/bash-git-prompt/gitprompt.sh
 fi
