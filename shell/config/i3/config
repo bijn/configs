@@ -51,7 +51,7 @@ client.urgent           $red $red $background $red
 
 # Font for window titles. Will also be used by the bar unless a
 # different font is used in the bar {} block below.
-font pango:monospace 8
+font pango:Iosevka ss09 10
 
 # i3 status bar --------------------------------------------------------
 

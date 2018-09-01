@@ -18,7 +18,7 @@
 start by setting the time,
 
 ```bash
-timedatectl set-ntp true
+timedatectl set-ntp 1
 ```
 
 next we need to partition our disk using `fdisk`,
@@ -293,6 +293,14 @@ like Chrome,
 ```bash
 pacman -S ttf-dejavu
 ```
+
+Better monospace,
+
+```bash
+aurman -S ttf-iosevka-ss09
+```
+
+I had to logout for the change to be seen in x.
 
 ### Browsers
 
