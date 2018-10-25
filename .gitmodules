@@ -7,3 +7,6 @@
 [submodule "bash-git-prompt"]
 	path = modules/bash-git-prompt
 	url = https://github.com/magicmonty/bash-git-prompt
+[submodule "bats"]
+	path = modules/bats
+	url = https://github.com/bats-core/bats-core
