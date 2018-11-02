@@ -1,53 +1,138 @@
 # install.bats
 
+# todo
+# - long options
+# - check for git-user && bash-config backups every time
+
 CONFIGS_INSTALLER=$CONFIGS_DIR/misc/scripts/install.sh
 CONFIGS_BGPTHEMES=$CONFIGS_DIR/modules/bash-git-prompt/themes
-INSTALLER_CMD="$(cat $CONFIGS_INSTALLER)"
+CONFIGS_BACKUP=$CONFIGS_DIR/shell/config/tmp/backup
 
-function does_exist()
-{
-    file_type=$1; file=$2; should_exist=$3
-
-    if [ "$should_exist" = "yes" ]
-    then
-        [ $file_type $file ]
-    else
-        ! [ $file_type $file ]
-    fi
-}
+GIT_INSTALLER="echo -e \"name\nemail\nusername\n\" | $CONFIGS_INSTALLER"
 
 function check_installed()
 {
-    should_exist=$1
-
-    does_exist "-L" $CONFIGS_BGPTHEMES/my-theme.bgptheme $should_exist
-    does_exist "-L" $HOME/.bash_login $should_exist
-    does_exist "-L" $HOME/.bash_logout $should_exist
-    does_exist "-L" $HOME/.bashrc $should_exist
-    does_exist "-L" $HOME/.bin $should_exist
-    does_exist "-L" $HOME/.config $should_exist
-    does_exist "-L" $HOME/.ssh $should_exist
-    does_exist "-f" $HOME/.config/tmp/bash-config.bash $should_exist
-    does_exist "-f" $HOME/.config/tmp/install.manifest $should_exist
+    [ -L $CONFIGS_BGPTHEMES/my-theme.bgptheme ]
+    [ -L $HOME/.bash_login ]
+    [ -L $HOME/.bash_logout ]
+    [ -L $HOME/.bashrc ]
+    [ -L $HOME/.bin ]
+    [ -L $HOME/.config ]
+    [ -L $HOME/.ssh ]
+    [ -f $HOME/.config/tmp/bash-config.bash ]
+    [ -f $HOME/.config/tmp/install.manifest ]
 }
 
-@test "Clean local install." {
-    # run /bin/bash -c "$(curl -fsL https://git.io/fxKQ2)" -- $CONFIGS_DIR
-    run /bin/bash -c "$INSTALLER_CMD" -- $CONFIGS_DIR
-    [ $status -eq 0 ] && check_installed yes
+function check_uninstalled()
+{
+    ! [ -L $CONFIGS_BGPTHEMES/my-theme.bgptheme ]
+    ! [ -L $HOME/.bash_login ]
+    ! [ -L $HOME/.bash_logout ]
+    ! [ -L $HOME/.bashrc ]
+    ! [ -L $HOME/.bin ]
+    ! [ -L $HOME/.config ]
+    ! [ -L $HOME/.ssh ]
+    ! [ -f $HOME/.config/tmp/bash-config.bash ]
+    ! [ -f $HOME/.config/tmp/git-user.config ]
+    ! [ -f $HOME/.config/tmp/install.manifest ]
 }
 
-@test "Attempt to reinstall." {
-    run /bin/bash -c "$INSTALLER_CMD" -- $CONFIGS_DIR
-    [ $status -ne 0 ] && check_installed yes
+function check_has_backup()
+{
+    [ -e $CONFIGS_BACKUP/my-theme.bgptheme ]
+    [ -e $CONFIGS_BACKUP/.bash_login ]
+    [ -e $CONFIGS_BACKUP/.bash_logout ]
+    [ -e $CONFIGS_BACKUP/.bashrc ]
+    [ -e $CONFIGS_BACKUP/.bin ]
+    [ -e $CONFIGS_BACKUP/.config ]
+    [ -e $CONFIGS_BACKUP/.ssh ]
+    [ -f $CONFIGS_BACKUP/bash-config.bash ]
+}
+
+function check_no_backup()
+{
+    ! [ -e $CONFIGS_BACKUP/my-theme.bgptheme ]
+    ! [ -e $CONFIGS_BACKUP/.bash_login ]
+    ! [ -e $CONFIGS_BACKUP/.bash_logout ]
+    ! [ -e $CONFIGS_BACKUP/.bashrc ]
+    ! [ -e $CONFIGS_BACKUP/.bin ]
+    ! [ -e $CONFIGS_BACKUP/.config ]
+    ! [ -e $CONFIGS_BACKUP/.ssh ]
+    ! [ -f $CONFIGS_BACKUP/bash-config.bash ]
+    ! [ -f $CONFIGS_BACKUP/git-user.config ]
+}
+
+@test "Clean install." {
+    # run /bin/bash -c "$(curl -fsL https://git.io/fxKQ2)" -- -c $CONFIGS_DIR
+    run $CONFIGS_INSTALLER $CONFIGS_DIR
+    [ "$status" -eq 0 ] && check_installed
+}
+
+@test "Reinstall fail." {
+    run $CONFIGS_INSTALLER $CONFIGS_DIR
+    [ "$status" -ne 0 ] && check_installed
 }
 
 @test "Uninstall." {
-    run /bin/bash -c "$INSTALLER_CMD" -- -u $CONFIGS_DIR
-    [ $status -eq 0 ] && check_installed no
+    run $CONFIGS_INSTALLER -u $CONFIGS_DIR
+    [ "$status" -eq 0 ] && check_uninstalled
 }
 
-@test "Install with local path." {
-    run /bin/bash -c "$INSTALLER_CMD" -- $(basename $CONFIGS_DIR)
-    [ $status -eq 0 ] && check_installed yes
+@test "Install with relative path." {
+    run $CONFIGS_INSTALLER $(basename $CONFIGS_DIR)
+    [ "$status" -eq 0 ] && check_installed
+}
+
+@test "Uninstall with relative path." {
+    run $CONFIGS_INSTALLER -u $(basename $CONFIGS_DIR)
+    [ "$status" -eq 0 ] && check_uninstalled
+}
+
+@test "Force install." {
+    run $CONFIGS_INSTALLER -f $CONFIGS_DIR
+    [ "$status" -eq 0 ] && check_installed && check_no_backup
+
+    run $CONFIGS_INSTALLER -f $CONFIGS_DIR
+    [ "$status" -eq 0 ] && check_installed && check_has_backup
+}
+
+@test "Install with Git." {
+    run $CONFIGS_INSTALLER -u $CONFIGS_DIR
+    [ "$status" -eq 0 ] && check_uninstalled
+
+    run /bin/bash -c "$GIT_INSTALLER -g $CONFIGS_DIR"
+    [ "$status" -eq 0 ]
+
+    check_installed
+    [ -f $HOME/.config/tmp/git-user.config ]
+}
+
+@test "Uninstall with Git option." {
+    run $CONFIGS_INSTALLER -gu $CONFIGS_DIR
+    [ "$status" -eq 0 ] && check_uninstalled
+}
+
+@test "Force install with Git." {
+    run /bin/bash -c "$GIT_INSTALLER -fg $CONFIGS_DIR"
+    [ "$status" -eq 0 ]
+
+    run /bin/bash -c "$GIT_INSTALLER -fg $CONFIGS_DIR"
+    [ "$status" -eq 0 ]
+
+    check_installed
+    [ -f $HOME/.config/tmp/git-user.config ]
+
+    check_has_backup
+    [ -f $CONFIGS_BACKUP/git-user.config ]
+}
+
+@test "Keep going." {
+    run $CONFIGS_INSTALLER -u $CONFIGS_DIR
+    [ "$status" -eq 0 ]
+
+    mkdir ~/.configs
+    mkdir ~/.ssh
+
+    run $CONFIGS_INSTALLER -k $CONFIGS_DIR
+    [ "$status" -eq 0 ]
 }
