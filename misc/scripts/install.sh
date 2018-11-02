@@ -1,3 +1,7 @@
+# Constants ------------------------------------------------------------
+
+readonly OPTS="cgu"
+
 # Helpers --------------------------------------------------------------
 
 function dotfile()
@@ -34,14 +38,14 @@ function uninstall()
 
 function usage_exit()
 {
-    echo "USAGE: install.sh [-cgu] [--] path" >&2 && false
+    echo "USAGE: install.sh [-$OPTS] [--] path" >&2 && false
     exit
 }
 
 # Setup ----------------------------------------------------------------
 
 initial_dir=$PWD
-args=$(getopt "cpu" $*)
+args=$(getopt "$OPTS" $*)
 
 if [ "$?" != "0" ]
 then

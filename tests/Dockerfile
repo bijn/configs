@@ -6,7 +6,7 @@ ENV BATS /home/test/configs/modules/bats/bin/bats
 
 WORKDIR /home/test
 COPY . /home/test/configs
-RUN apt-get dist-upgrade
+RUN apt-get dist-upgrade \
         && apt-get update \
         && apt-get upgrade -y \
         && apt-get install -y git curl \
@@ -17,5 +17,5 @@ RUN apt-get dist-upgrade
 
 USER test
 
-CMD /bin/bash -c "$(cat $CONFIGS_INSTALLER)"  -- configs && bash
+CMD /bin/bash -c "$(cat $CONFIGS_INSTALLER)"  -- -c configs && bash
 CMD /bin/bash -c "$BATS --tap configs/tests/install.bats"
