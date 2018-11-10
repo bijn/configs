@@ -3,9 +3,9 @@
 # todo
 # - long options
 # - check for git-user && bash-config backups every time
+# - test -fk (f should take precedence?).
 
 CONFIGS_INSTALLER=$CONFIGS_DIR/misc/scripts/install.sh
-CONFIGS_BGPTHEMES=$CONFIGS_DIR/modules/bash-git-prompt/themes
 CONFIGS_BACKUP=$CONFIGS_DIR/shell/config/tmp/backup
 
 GIT_INSTALLER="echo -e \"name\nemail\nusername\n\" | $CONFIGS_INSTALLER"
@@ -17,8 +17,8 @@ function check_installed()
     [ -L $HOME/.bash_logout ]
     [ -L $HOME/.bashrc ]
     [ -L $HOME/.bin ]
-    [ -L $HOME/.config ]
-    [ -L $HOME/.ssh ]
+    [ -d $HOME/.config ]
+    [ -d $HOME/.ssh ]
     [ -f $HOME/.config/tmp/bash-config.bash ]
     [ -f $HOME/.config/tmp/install.manifest ]
 }
@@ -30,8 +30,8 @@ function check_uninstalled()
     ! [ -L $HOME/.bash_logout ]
     ! [ -L $HOME/.bashrc ]
     ! [ -L $HOME/.bin ]
-    ! [ -L $HOME/.config ]
-    ! [ -L $HOME/.ssh ]
+    ! [ -d $HOME/.config ]
+    ! [ -d $HOME/.ssh ]
     ! [ -f $HOME/.config/tmp/bash-config.bash ]
     ! [ -f $HOME/.config/tmp/git-user.config ]
     ! [ -f $HOME/.config/tmp/install.manifest ]
@@ -63,7 +63,6 @@ function check_no_backup()
 }
 
 @test "Clean install." {
-    # run /bin/bash -c "$(curl -fsL https://git.io/fxKQ2)" -- -c $CONFIGS_DIR
     run $CONFIGS_INSTALLER $CONFIGS_DIR
     [ "$status" -eq 0 ] && check_installed
 }
@@ -128,11 +127,35 @@ function check_no_backup()
 
 @test "Keep going." {
     run $CONFIGS_INSTALLER -u $CONFIGS_DIR
-    [ "$status" -eq 0 ]
+    [ "$status" -eq 0 ] && check_uninstalled
 
-    mkdir ~/.configs
-    mkdir ~/.ssh
+    mkdir $HOME/.config
+    mkdir $HOME/.ssh
 
     run $CONFIGS_INSTALLER -k $CONFIGS_DIR
+    [ "$status" -eq 0 ] && check_installed
+
+    ls -la $HOME
+
+    run $CONFIGS_INSTALLER -u $CONFIGS_DIR
     [ "$status" -eq 0 ]
+
+    ls -la $HOME
+
+    ! [ -L $CONFIGS_BGPTHEMES/my-theme.bgptheme ]
+    ! [ -L $HOME/.bash_login ]
+    ! [ -L $HOME/.bash_logout ]
+    ! [ -L $HOME/.bashrc ]
+    ! [ -L $HOME/.bin ]
+    [ -d $HOME/.config ]
+    [ -d $HOME/.ssh ]
+    ! [ -f $HOME/.config/tmp/bash-config.bash ]
+    ! [ -f $HOME/.config/tmp/git-user.config ]
+    ! [ -f $HOME/.config/tmp/install.manifest ]
+
+    run ls $HOME/.config
+    [ -z "$output" ]
+
+    run ls $HOME/.ssh
+    [ -z "$output" ]
 }

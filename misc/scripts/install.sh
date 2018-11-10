@@ -2,12 +2,14 @@
 
 # todo
 # - delete bash-config.bash and git-user.config on uninstall?
+# - '-i' option (like rm).
+# - config modules.
 
 # Constants ------------------------------------------------------------
 
-readonly SCRIPT="$0"
-readonly OPTS="cfghku"
-readonly REPO="https://github.com/bijn/configs"
+readonly SCRIPT_NAME="$0"
+readonly CLI_OPTS="cfghiku"
+readonly CONFIGS_REPO="https://github.com/bijn/configs"
 
 # Helpers --------------------------------------------------------------
 
@@ -42,10 +44,23 @@ function link_file()
 {
     src_file=$1; dst_file=$2; install_manifest=$3
 
-    if ln -s $src_file $dst_file >& /dev/null
+    if ! [ -e "$dst_file" ]
     then
-        echo $dst_file >> $install_manifest
-        return
+        if ln -s $src_file $dst_file >& /dev/null
+        then
+            echo $dst_file >> $install_manifest
+            return
+        fi
+    else
+        if [ -d "$src_file" ] && [ -d "$dst_file" ]
+        then
+            dst_dir=$dst_file
+            for file in $src_file/*
+            do
+                link_file \
+                    $file $dst_dir/$(basename $file) $install_manifest
+            done
+        fi
     fi
 
     false
@@ -68,7 +83,7 @@ function uninstall()
 
 function usage_exit()
 {
-    cerr "USAGE: $SCRIPT [-$OPTS] [--] path" && false
+    cerr "USAGE: $SCRIPT_NAME [-$CLI_OPTS] [--] path" && false
     # long options
     exit
 }
@@ -92,11 +107,12 @@ done
 
 do_clone=""
 do_force=""
+do_query=""
 do_git_setup=""
 keep_going=""
 do_ininstall=""
 
-while getopts "$OPTS" opt
+while getopts "$CLI_OPTS" opt
 do
     case "$opt"
     in
@@ -104,51 +120,52 @@ do
         f) do_force=yes;;
         g) do_git_setup=yes;;
         h) usage_exit;;
-        h) keep_going=yes;;
+        i) cerr "CLI option '-i' unimplemented."; usage_exit;;
+        k) keep_going=yes;;
         u) do_uninstall=yes;;
         *) usage_exit;;
     esac
 done
 
 shift $((OPTIND-1))
-config_dir=$*
+configs_dir=$*
 
-if [ -z "$config_dir" ]
+if [ -z "$configs_dir" ]
 then
     usage_exit
 fi
 
 if [ "$do_uninstall" = "yes" ]
 then
-    uninstall $config_dir
+    uninstall $configs_dir
     exit
 fi
 
 if [ "$do_clone" = "yes" ]
 then
-    if ! git clone --recursive $REPO $config_dir
+    if ! git clone --recursive $CONFIGS_REPO $configs_dir
     then
         cerr "Unable to clone repository. Exiting..." && false
         exit
     fi
 fi
 
-case $config_dir
+case $configs_dir
 in
-    /*) config_path=$config_dir;;
-    *) config_path=$PWD/$config_dir;;
+    /*) config_path=$configs_dir;;
+    *) config_path=$PWD/$configs_dir;;
 esac
 
-# Top level stuff ------------------------------------------------------
-
+# Variables
 bgp_src=$config_path/misc/bash-git-prompt/my-theme.bgptheme
 bgp_dst=$config_path/modules/bash-git-prompt/themes/my-theme.bgptheme
-
-shell_dir=$config_dir/shell
+shell_dir=$configs_dir/shell
 tmp_dir=$shell_dir/config/tmp
 bash_config=$tmp_dir/bash-config.bash
 git_config=$tmp_dir/git-user.config
 manifest=$tmp_dir/install.manifest
+
+# Install --------------------------------------------------------------
 
 if [ "$do_force" = "yes" ] && [ -e "$manifest" ]
 then
@@ -171,23 +188,30 @@ then
     cerr "Warning, unable to link my-theme.bgptheme..."
 fi
 
-for file in $shell_dir/*
-do
-    if [ -e "$(dotfile $file)" ]
-    then
-        if [ "$do_force" = "yes" ]
+if [ "$do_force" = "yes" ] || [ -z "$keep_going" ]
+then
+    for file in $shell_dir/*
+    do
+        if [ -e "$(dotfile $file)" ]
         then
-            backup_file $tmp_dir $(dotfile $file)
-        else
-            cerr "Error, $(dotfile $file) exists. Exiting..." && false
-            exit
+            if [ "$do_force" = "yes" ]
+            then
+                backup_file $tmp_dir $(dotfile $file)
+            else
+                cerr "Error, $(dotfile $file) exists. Exiting..."
+                false
+                exit
+            fi
         fi
-    fi
-done
+    done
+fi
 
 for file in $shell_dir/*
 do
-    link_file $file $(dotfile $file) $manifest
+    if ! link_file $file $(dotfile $file) $manifest
+    then
+        cerr "Warning, unable to link $file..."
+    fi
 done
 
 # Temp files -----------------------------------------------------------
@@ -198,8 +222,8 @@ echo "export SH_ROOT_DIR=$config_path" > $bash_config
 echo "export SH_MISC_DIR=\$SH_ROOT_DIR/misc" >> $bash_config
 echo "export SH_MODULE_DIR=\$SH_ROOT_DIR/modules" >> $bash_config
 echo "export SH_SETTINGS_DIR=\$SH_ROOT_DIR/shell" >> $bash_config
-echo "export SH_CONFIG_DIR=\$SH_SETTINGS_DIR/config" >> $bash_config
-echo "export SH_TMP_DIR=\$SH_CONFIG_DIR/tmp" >> $bash_config
+echo "export SH_CONFIGS_DIR=\$SH_SETTINGS_DIR/config" >> $bash_config
+echo "export SH_TMP_DIR=\$SH_CONFIGS_DIR/tmp" >> $bash_config
 
 if [ "$do_git_setup" = "yes" ]
 then

@@ -1,7 +1,7 @@
 FROM ubuntu
 
 ENV CONFIGS_DIR /home/test/configs
-ENV CONFIGS_INSTALLER /home/test/configs/misc/scripts/install.sh
+ENV CONFIGS_BGPTHEMES $CONFIGS_DIR/modules/bash-git-prompt/themes
 ENV BATS /home/test/configs/modules/bats/bin/bats
 
 WORKDIR /home/test
@@ -14,18 +14,9 @@ RUN apt-get dist-upgrade \
         && chown -R test /home/test \
         && cd $CONFIGS_DIR/shell/config/tmp \
         && git clean -fdX \
-        && rm -rf $CONFIGS_DIR/modules/bash-git-prompt/themes/my-theme.bgptheme
+        && rm -rf $CONFIGS_BGPTHEMES/my-theme.bgptheme
 
 USER test
 
-CMD /bin/bash -c "$(cat $CONFIGS_INSTALLER)"  -- -c $CONFIGS_DIR && bash
-CMD /bin/bash -c "$BATS --tap configs/tests/install.bats"
-# CMD /bin/bash -c "$(cat $CONFIGS_INSTALLER)"  -- -f $CONFIGS_DIR \
-#         && cat ~/.config/tmp/install.manifest \
-#         && /bin/bash -c "$(cat $CONFIGS_INSTALLER)"  -- -f $CONFIGS_DIR \
-#         && cat ~/.config/tmp/install.manifest \
-#         && ls -a ~/.config/tmp/\
-# && ls -a $CONFIGS_DIR/modules/bash-git-prompt/themes \
-#         && /bin/bash -c "$(cat $CONFIGS_INSTALLER)"  -- -u $CONFIGS_DIR \
-# && ls -a $CONFIGS_DIR/modules/bash-git-prompt/themes \
-#         && ls -a $CONFIGS_DIR/shell/config/tmp/backup
+CMD /bin/bash -c "$(curl -fsL https://git.io/fxKQ2)" -- -c $CONFIGS_DIR
+CMD /bin/bash -c "$BATS --tap $CONFIGS_DIR/tests/install.bats"
