@@ -7,6 +7,7 @@
 
 CONFIGS_INSTALLER=$CONFIGS_DIR/misc/scripts/install.sh
 CONFIGS_BACKUP=$CONFIGS_DIR/shell/config/tmp/backup
+CONFIGS_BGPTHEMES=$CONFIGS_DIR/modules/bash-git-prompt/themes
 
 GIT_INSTALLER="echo -e \"name\nemail\nusername\n\" | $CONFIGS_INSTALLER"
 
