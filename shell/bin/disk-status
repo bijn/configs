@@ -1,0 +1,14 @@
+#!/bin/bash
+
+IO="$(echo $(vmstat 1 2 | tail -n 1) | cut -f 9- -d ' ')"
+BI=$(awk '{print $1}' <<< "$IO")
+BO=$(awk '{print $2}' <<< "$IO")
+
+STATUS="bi: $BI, bo: $BO\n"
+
+if [[ "$1" == "i3blocks" ]]
+then
+    printf "$STATUS\n#8be9fd\n"
+else
+    printf "$(tput setaf 6)$STATUS$(tput sgr0)"
+fi

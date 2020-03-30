@@ -1,0 +1,42 @@
+#!/bin/bash
+
+IF="$1"
+
+if [ -z "$IF" ]
+then
+    print-usage "$0 interface [i3blocks]"
+    false
+    exit
+fi
+
+STATE="$(cat /sys/class/net/$IF/operstate)"
+COLOR='#ff5555'
+TPUT="$(tput setaf 1)"
+
+if [[ "$STATE" == "up" ]]
+then
+    COLOR='#50fa7b'
+    TPUT="$(tput setaf 2)"
+
+    # https://hewlettpackard.github.io/wireless-tools
+    WIFI="$(grep $IF /proc/net/wireless)"
+    if ! [ -z "$WIFI" ]
+    then
+        # content
+        SSID="$(iw $IF info | grep ssid | cut -f 2- -d ' ')"
+        QUALITY="$(awk '{ print int($3 / 70 * 100) }' <<< $WIFI)"
+
+        # format
+        SSID=" ($SSID)"
+        QUALITY=": $QUALITY%%"
+    fi
+fi
+
+STATUS="$IF$SSID$QUALITY\n"
+
+if [[ "$2" == "i3blocks" ]]
+then
+    printf "$STATUS\n$COLOR\n"
+else
+    printf "$TPUT$STATUS$(tput sgr0)"
+fi

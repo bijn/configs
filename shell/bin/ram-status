@@ -1,0 +1,29 @@
+#!/bin/bash
+
+MEM_FREE=$(grep MemFree /proc/meminfo | awk '{print $2}')
+MEM_AVAIL=$(grep MemAvailable /proc/meminfo | awk '{print $2}')
+MEM_TOTAL=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+PCT=$(awk '{print int($1 / $2 * 100)}' <<< "$MEM_AVAIL $MEM_TOTAL")
+
+if [ $PCT -gt 75 ]
+then
+    COLOR="#50fa7b"
+    TPUT="$(tput setaf 2)"
+elif [ $PCT -gt 35 ]
+then
+    COLOR="#f1fa8c"
+    TPUT="$(tput setaf 3)"
+else
+    COLOR="#ff5555"
+    TPUT="$(tput setaf 1)"
+fi
+
+# STATUS="($MEM_AVAIL / $MEM_TOTAL): $PCT%%, free: $MEM_FREE\n"
+STATUS="($MEM_AVAIL / $MEM_TOTAL): $PCT%%\n"
+
+if [[ "$1" == "i3blocks" ]]
+then
+    printf "available: $STATUS\n$COLOR\n"
+else
+    printf "available: $TPUT$STATUS$(tput sgr0)"
+fi

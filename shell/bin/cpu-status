@@ -1,0 +1,59 @@
+#!/bin/bash
+
+function check-cpu-load()
+{
+    local load=$1
+    if ! python -c "exit($load < 25)"
+    then
+        COLOR="#50fa7b"
+        TPUT="$(tput setaf 2)"
+    elif ! python -c "exit($load < 70)"
+    then
+        COLOR="#f1fa8c"
+        TPUT="$(tput setaf 3)"
+    else
+        COLOR="#ff5555"
+        TPUT="$(tput setaf 1)"
+    fi
+    echo $COLOR
+    echo $TPUT
+}
+
+if [[ "$1" == "i3blocks" ]]
+then
+    ID="$2"
+    STATUS=""
+
+    if [ $ID -gt 3 ]
+    then
+        print-err "Error, cpu id must be less than 4."
+        false
+        exit
+    fi
+elif [ -z "$1" ]
+then
+    STATUS="load: "
+else
+    print-usage "$0 [i3blocks <cpu id>]"
+    false
+    exit
+fi
+
+# https://unix.stackexchange.com/questions/152988
+LOADS=($(mpstat -P ALL 1 1 | awk '/Average:/ && $2 ~ /[0-9]/ {print $3}'))
+# LOADS=(35 74.5 12.5 100.0)
+
+if [[ "$1" == "i3blocks" ]]
+then
+    STATUS+="${LOADS[$ID]}\n"
+    STATUS+="\n$(check-cpu-load ${LOADS[$ID]} | head -n 1)\n"
+else
+    for LOAD in ${LOADS[*]}
+    do
+        STATUS+="$(check-cpu-load $LOAD | tail -n 1)"
+        STATUS+="$LOAD "
+    done
+    STATUS+="$(tput sgr0)\n"
+fi
+
+printf "$STATUS"

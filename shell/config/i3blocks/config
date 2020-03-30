@@ -1,0 +1,52 @@
+[disk]
+command=disk-status i3blocks
+interval=5
+
+[cpu0]
+command=cpu-status i3blocks 0
+interval=5
+
+[cpu1]
+command=cpu-status i3blocks 1
+interval=5
+
+[cpu2]
+command=cpu-status i3blocks 2
+interval=5
+
+[cpu3]
+command=cpu-status i3blocks 3
+interval=5
+
+[ram]
+command=ram-status i3blocks
+interval=5
+
+[ethernet]
+command=if-status eth0 i3blocks
+interval=5
+
+# command=OPERSTATE="$(cat /sys/class/net/eth0/operstate)"; echo "eth0 $OPERSTATE" && if [[ "$OPERSTATE" == "down" ]]; then printf '\n#ff5555\n' else printf '\n#50fa7b\n'; fi
+# interval=10
+
+[wireless]
+command=if-status wlan0 i3blocks
+interval=5
+
+# command=OPERSTATE="$(cat /sys/class/net/wlan0/operstate)"; echo -n "wlan0 $OPERSTATE"; if [[ "$OPERSTATE" == "up" ]]; then echo " ($(iw wlan0 info | grep ssid | cut -f 1 -d ' ' --complement)): $(grep wlan0 /proc/net/wireless | awk '{ print int($3 * 100 / 70) }')%"; fi
+# interval=5
+
+[ip]
+command=echo "$(whoami)@$(hostname)($(hostname -i | awk '{print $1}'))"
+interval=once
+color=#8be9fd
+
+[weather]
+command=weather-status i3blocks
+interval=3600
+color=#8be9fd
+
+[time]
+command=date '+%Y-%m-%d %H:%M:%S '
+interval=1
+color=#8be9fd
