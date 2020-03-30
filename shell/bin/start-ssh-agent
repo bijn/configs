@@ -19,10 +19,10 @@ fi
 # doesn't seem like i need to start the ssh agent at all, ssh-add -l
 # automatically does it
 
-# if ! ( ps -ax | grep [s]sh-agent >& /dev/null )
-# then
-#     eval "$(ssh-agent -s)"
-# fi
+if ! ( ps -ax | grep " [s]sh-agent" >& /dev/null )
+then
+    eval "$(ssh-agent -s)"
+fi
 
 if [ -f $HOME/.ssh/default-keys.txt ]
 then
@@ -33,7 +33,7 @@ then
             ssh-add $HOME/.ssh/keys/$key
         fi
     done
-    return
+    exit
 else
     echo "Could not find key list at ~/.ssh/default-keys.txt" >&2
 fi
