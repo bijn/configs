@@ -159,7 +159,7 @@ esac
 # Variables
 bgp_src=$config_path/misc/bash-git-prompt/my-theme.bgptheme
 bgp_dst=$config_path/modules/bash-git-prompt/themes/my-theme.bgptheme
-shell_dir=$configs_dir/shell
+shell_dir=$configs_path/shell
 tmp_dir=$shell_dir/config/tmp
 bash_config=$tmp_dir/bash-config.bash
 git_config=$tmp_dir/git-user.config
@@ -222,8 +222,8 @@ echo "export SH_ROOT_DIR=$config_path" > $bash_config
 echo "export SH_MISC_DIR=\$SH_ROOT_DIR/misc" >> $bash_config
 echo "export SH_MODULE_DIR=\$SH_ROOT_DIR/modules" >> $bash_config
 echo "export SH_SETTINGS_DIR=\$SH_ROOT_DIR/shell" >> $bash_config
-echo "export SH_CONFIGS_DIR=\$SH_SETTINGS_DIR/config" >> $bash_config
-echo "export SH_TMP_DIR=\$SH_CONFIGS_DIR/tmp" >> $bash_config
+echo "export SH_CONFIG_DIR=\$SH_SETTINGS_DIR/config" >> $bash_config
+echo "export SH_TMP_DIR=\$SH_CONFIG_DIR/tmp" >> $bash_config
 
 if [ "$do_git_setup" = "yes" ]
 then
