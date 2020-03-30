@@ -1,4 +1,5 @@
 *borderWidth:0
-*faceName: Iosevka ss09
-*faceSize: 10
+*faceName: Source Code Pro
+*faceSize: 9
 Xcursor.size:16
+xterm*vt100.metaSendsEscape: true
