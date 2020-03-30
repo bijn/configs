@@ -2,6 +2,7 @@ google-chrome
 mimeapps.list
 pulse
 configstore
+dconf
 discord
 tmp/*
 !tmp/README.md

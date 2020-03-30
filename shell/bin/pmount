@@ -1,0 +1,18 @@
+#!/bin/bash
+
+src=$1
+dst=$2
+
+if [ -z "$src" ]
+then
+    false
+    exit
+fi
+
+if [ -z "$dst" ]
+then
+    dst=/mnt/tmp
+fi
+
+# https://askubuntu.com/questions/251206
+mount -o umask=000 $src $dst

@@ -1,0 +1,96 @@
+#!/bin/bash
+
+if ! which bindfs > /dev/null
+then
+    false
+    exit
+fi
+
+for arg in "$@"
+do
+    shift
+    case "$arg"
+    in
+        "--source-user") set -- "$@" "-U" ;;
+        "--dest-user") set -- "$@" "-u" ;;
+        *) set -- "$@" "$arg" ;;
+    esac
+done
+
+while getopts "U:iu:" opt
+do
+    case "${opt}"
+    in
+        U) susr=$OPTARG ;;
+        u) dusr=$OPTARG ;;
+        i) prompt=yes ;;
+        *) false; exit ;;
+    esac
+done
+
+shift $(($OPTIND - 1))
+if [ "$#" -ne 2 ]
+then
+    false
+    exit
+fi
+
+src="$1"
+dst="$2"
+
+if ! [ -e $src ]
+then
+    false
+    exit
+fi
+
+if ! [ -e $dst ]
+then
+    false
+    exit
+fi
+
+if ! [ -e $src/home/$susr ]
+then
+    false
+    exit
+fi
+
+if [ -z "$dusr" ]
+then
+    susr=$(whoami)
+fi
+
+if [ -z "$susr" ]
+then
+    susr=$dusr
+fi
+
+spasswd=$(grep $susr $src/etc/passwd | tr ':' ' ')
+if [ -z "$spasswd" ]
+then
+    false
+    exit
+fi
+
+suid=$(awk '{print $3}' <<< "$spasswd")
+sgid=$(awk '{print $4}' <<< "$spasswd")
+duid=$(id -u $dusr)
+dgid=$(id -g $dusr)
+
+printf "bindfs '%s' to '%s' as user '%s' (%s).\n" \
+       $src $dst \
+       $dusr \
+       "$duid:$suid/$dgid:$sgid"
+
+if ! [ -z "$prompt" ]
+then
+    while read -t 0.1; do :; done
+    read -p "Press enter to continue..."
+fi
+
+bindfs \
+    --create-for-user=$suid \
+    --create-for-group=$sgid \
+    --mirror="$suid:$suid,@$dgid:$sgid" \
+    $src/home/$susr $dst
